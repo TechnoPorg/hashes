@@ -19,7 +19,6 @@ digest = "0.10.7"
 cfg-if = "1.0"
 
 [target.'cfg(any(target_arch = "aarch64", target_arch = "x86_64", target_arch = "x86"))'.dependencies]
-cpufeatures = "0.2"
 sha2-asm = { version = "0.6.1", optional = true }
 
 [dev-dependencies]
@@ -30,7 +29,9 @@ hex-literal = "0.2.2"
 default = ["std"]
 std = ["digest/std"]
 oid = ["digest/oid"] # Enable OID support. WARNING: Bumps MSRV to 1.57
-asm = ["sha2-asm"] # WARNING: this feature SHOULD NOT be enabled by library crates
+asm = [
+    "sha2-asm",
+] # WARNING: this feature SHOULD NOT be enabled by library crates
 compress = [] # Expose compress functions
 force-soft = [] # Force software implementation
 asm-aarch64 = ["asm"] # DEPRECATED: use `asm` instead

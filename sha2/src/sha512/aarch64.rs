@@ -4,16 +4,14 @@ use core::arch::{aarch64::*, asm};
 
 use crate::consts::K64;
 
-cpufeatures::new!(sha3_hwcap, "sha3");
-
+#[cfg(target_feature = "sha3")]
 pub fn compress(state: &mut [u64; 8], blocks: &[[u8; 128]]) {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if sha3_hwcap::get() {
-        unsafe { sha512_compress(state, blocks) }
-    } else {
-        super::soft::compress(state, blocks);
-    }
+    unsafe { sha512_compress(state, blocks) }
+}
+
+#[cfg(not(target_feature = "sha3"))]
+pub fn compress(state: &mut [u64; 8], blocks: &[[u8; 128]]) {
+    super::soft::compress(state, blocks);
 }
 
 #[target_feature(enable = "sha3")]

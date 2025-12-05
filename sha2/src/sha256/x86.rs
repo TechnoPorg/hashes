@@ -97,16 +97,24 @@ unsafe fn digest_blocks(state: &mut [u32; 8], blocks: &[[u8; 64]]) {
     _mm_storeu_si128(state_ptr_mut.add(1), hgef);
 }
 
-cpufeatures::new!(shani_cpuid, "sha", "sse2", "ssse3", "sse4.1");
-
+#[cfg(all(
+    target_feature = "sha",
+    target_feature = "sse2",
+    target_feature = "ssse3",
+    target_feature = "sse4.1"
+))]
 pub fn compress(state: &mut [u32; 8], blocks: &[[u8; 64]]) {
-    // TODO: Replace with https://github.com/rust-lang/rfcs/pull/2725
-    // after stabilization
-    if shani_cpuid::get() {
-        unsafe {
-            digest_blocks(state, blocks);
-        }
-    } else {
-        super::soft::compress(state, blocks);
+    unsafe {
+        digest_blocks(state, blocks);
     }
+}
+
+#[cfg(not(all(
+    target_feature = "sha",
+    target_feature = "sse2",
+    target_feature = "ssse3",
+    target_feature = "sse4.1"
+)))]
+pub fn compress(state: &mut [u32; 8], blocks: &[[u8; 64]]) {
+    super::soft::compress(state, blocks);
 }
