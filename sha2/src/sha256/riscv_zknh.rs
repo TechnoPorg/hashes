@@ -1,10 +1,31 @@
 #[cfg(not(any(target_arch = "riscv32", target_arch = "riscv64")))]
 compile_error!("riscv-zknh backend can be used only on riscv32 and riscv64 target arches");
 
-#[cfg(target_arch = "riscv32")]
-use core::arch::riscv32::{sha256sig0, sha256sig1, sha256sum0, sha256sum1};
-#[cfg(target_arch = "riscv64")]
-use core::arch::riscv64::{sha256sig0, sha256sig1, sha256sum0, sha256sum1};
+use core::arch::asm;
+
+fn sha256sig0(x: u32) -> u32 {
+    let a: u32;
+    unsafe { asm!("sha256sig0 {rd}, {rs1}", rd = out(reg) a, rs1 = in(reg) x) };
+    a
+}
+
+fn sha256sig1(x: u32) -> u32 {
+    let a: u32;
+    unsafe { asm!("sha256sig1 {rd}, {rs1}", rd = out(reg) a, rs1 = in(reg) x) };
+    a
+}
+
+fn sha256sum0(x: u32) -> u32 {
+    let a: u32;
+    unsafe { asm!("sha256sum0 {rd}, {rs1}", rd = out(reg) a, rs1 = in(reg) x) };
+    a
+}
+
+fn sha256sum1(x: u32) -> u32 {
+    let a: u32;
+    unsafe { asm!("sha256sum1 {rd}, {rs1}", rd = out(reg) a, rs1 = in(reg) x) };
+    a
+}
 
 cfg_if::cfg_if! {
     if #[cfg(sha2_backend_riscv_zknh = "compact")] {

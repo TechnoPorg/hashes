@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Removed workaround for unaligned loads in `riscv-zknh` backend ([#879])
 - `riscv-zknh` no longer requires `zbkb` (or `zbb`) target feature ([#879])
+- `riscv-zknh` no longer requires nightly toolchain ([#915])
 
 [#879]: https://github.com/RustCrypto/hashes/pull/879
+[#915]: https://github.com/RustCrypto/hashes/pull/915
 
 ## 0.11.0 (2026-03-25)
 ### Changed

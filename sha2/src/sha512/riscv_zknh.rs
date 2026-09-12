@@ -1,3 +1,5 @@
+use core::arch::asm;
+
 #[cfg(not(any(target_arch = "riscv32", target_arch = "riscv64")))]
 compile_error!("riscv-zknh backend can be used only on riscv32 and riscv64 target arches");
 
@@ -24,37 +26,64 @@ pub(super) fn compress(state: &mut [u64; 8], blocks: &[[u8; 128]]) {
 
 cfg_if::cfg_if! {
     if #[cfg(target_arch = "riscv64")] {
-        use core::arch::riscv64::{sha512sig0, sha512sig1, sha512sum0, sha512sum1};
-    } else {
-        use core::arch::riscv32::{
-            sha512sig0h, sha512sig0l, sha512sig1h, sha512sig1l, sha512sum0r, sha512sum1r,
-        };
+        fn sha512sum0(x: u64) -> u64 {
+            let a: u64;
+            unsafe { asm!("sha512sum0 {rd}, {rs1}", rd = out(reg) a, rs1 = in(reg) x); }
+            a
+        }
 
+        fn sha512sum1(x: u64) -> u64 {
+            let a: u64;
+            unsafe { asm!("sha512sum1 {rd}, {rs1}", rd = out(reg) a, rs1 = in(reg) x); }
+            a
+        }
+
+        fn sha512sig0(x: u64) -> u64 {
+            let a: u64;
+            unsafe { asm!("sha512sig0 {rd}, {rs1}", rd = out(reg) a, rs1 = in(reg) x); }
+            a
+        }
+
+        fn sha512sig1(x: u64) -> u64 {
+            let a: u64;
+            unsafe { asm!("sha512sig1 {rd}, {rs1}", rd = out(reg) a, rs1 = in(reg) x); }
+            a
+        }
+
+    } else {
         #[target_feature(enable = "zknh")]
         fn sha512sum0(x: u64) -> u64 {
-            let a = sha512sum0r((x >> 32) as u32, x as u32);
-            let b = sha512sum0r(x as u32, (x >> 32) as u32);
+            let a: u32;
+            unsafe { asm!("sha512sum0r {rd}, {rs1}, {rs2}", rd = out(reg) a, rs1 = in(reg) (x >> 32) as u32, rs2 = in(reg) x as u32); }
+            let b: u32;
+            unsafe { asm!("sha512sum0r {rd}, {rs1}, {rs2}", rd = out(reg) b, rs1 = in(reg) x as u32, rs2 = in(reg) (x >> 32) as u32); }
             ((a as u64) << 32) | (b as u64)
         }
 
         #[target_feature(enable = "zknh")]
         fn sha512sum1(x: u64) -> u64 {
-            let a = sha512sum1r((x >> 32) as u32, x as u32);
-            let b = sha512sum1r(x as u32, (x >> 32) as u32);
+            let a: u32;
+            unsafe { asm!("sha512sum1r {rd}, {rs1}, {rs2}", rd = out(reg) a, rs1 = in(reg) (x >> 32) as u32, rs2 = in(reg) x as u32); }
+            let b: u32;
+            unsafe { asm!("sha512sum1r {rd}, {rs1}, {rs2}", rd = out(reg) b, rs1 = in(reg) x as u32, rs2 = in(reg) (x >> 32) as u32); }
             ((a as u64) << 32) | (b as u64)
         }
 
         #[target_feature(enable = "zknh")]
         fn sha512sig0(x: u64) -> u64 {
-            let a = sha512sig0h((x >> 32) as u32, x as u32);
-            let b = sha512sig0l(x as u32, (x >> 32) as u32);
+            let a: u32;
+            unsafe { asm!("sha512sig0h {rd}, {rs1}, {rs2}", rd = out(reg) a, rs1 = in(reg) (x >> 32) as u32, rs2 = in(reg) x as u32); }
+            let b: u32;
+            unsafe { asm!("sha512sig0l {rd}, {rs1}, {rs2}", rd = out(reg) b, rs1 = in(reg) x as u32, rs2 = in(reg) (x >> 32) as u32); }
             ((a as u64) << 32) | (b as u64)
         }
 
         #[target_feature(enable = "zknh")]
         fn sha512sig1(x: u64) -> u64 {
-            let a = sha512sig1h((x >> 32) as u32, x as u32);
-            let b = sha512sig1l(x as u32, (x >> 32) as u32);
+            let a: u32;
+            unsafe { asm!("sha512sig1h {rd}, {rs1}, {rs2}", rd = out(reg) a, rs1 = in(reg) (x >> 32) as u32, rs2 = in(reg) x as u32); }
+            let b: u32;
+            unsafe { asm!("sha512sig1l {rd}, {rs1}, {rs2}", rd = out(reg) b, rs1 = in(reg) x as u32, rs2 = in(reg) (x >> 32) as u32); }
             ((a as u64) << 32) | (b as u64)
         }
     }

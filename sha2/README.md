@@ -104,10 +104,10 @@ flags respectively.
 
 ### About `riscv-zknh`
 
-This is an experimental RISC-V-only backend which requires a Nightly compiler and
-to enable the `Zknh` target feature at compile time. For a more efficient code generation,
-it's recommended to enable the `Zbkb` (or `Zbb`) and `unaligned-scalar-mem` target features
-(see [this LLVM issue][Zicclsm] for more information). For example, you can do it by using
+This is an experimental RISC-V-only backend which requires enabling the `Zknh` target
+feature at compile time. For a more efficient code generation, it's recommended to enable
+the `Zbkb` (or `Zbb`) and `unaligned-scalar-mem` target features (see [this LLVM issue][Zicclsm]
+for more information). For example, you can do it by using
 `RUSTFLAGS="-C target-feature=+zknh,+zbkb,+unaligned-scalar-mem"`.
 
 [Zicclsm]: https://github.com/llvm/llvm-project/issues/110454
